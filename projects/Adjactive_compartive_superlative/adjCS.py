@@ -53,7 +53,7 @@ def get_comp_sup(adjs):
 def get_comparative_form(adj):
     if adj in IRREGULAR_ADJECTIVES:
         return IRREGULAR_ADJECTIVES[adj][0]
-    if re.match(r"^[aeiou][a-z]*$", adj):
+    elif re.match(r"^[aeiou][a-z]*$", adj):
         return adj + "er"
     else:
         return "more " + adj
@@ -62,7 +62,7 @@ def get_comparative_form(adj):
 def get_superlative_form(adj):
     if adj in IRREGULAR_ADJECTIVES:
         return IRREGULAR_ADJECTIVES[adj][1]
-    if re.match(r"^[aeiou][a-z]*$", adj):
+    elif re.match(r"^[aeiou][a-z]*$", adj):
         return adj + "est"
     else:
         return "most " + adj
