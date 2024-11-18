@@ -1,26 +1,30 @@
-from tkinter import *
+import tkinter as tk
 import datetime
 import time
-from threading import *
+from threading import Thread
+import pygame
 from pygame import mixer
 
+
 # create object
-root = Tk()
+root = tk.Tk()
 root.geometry("500x250")
 
 
-def Threading():
-    t1 = Thread(target=alarm)
-    t1.start()
+#def threading():
+#    t1 = Thread(target=alarm)
+#    t1.start()
 
+alarm_setting = False
+current_thread = None
 
 def alarm():
     # alarm set to an infinite loop
-    while True:
+    global alarm_setting
+    while alarm_setting:
         # alarm set
         set_alarm_time = f"{hour.get()}:{minute.get()}:{second.get()}"
         time.sleep(1)
-
         # get current time
         current_time = datetime.datetime.now().strftime("%H:%M:%S")
         print(current_time, set_alarm_time)
@@ -31,194 +35,74 @@ def alarm():
             # play sound continuously
             mixer.init()
             mixer.music.load("sound.wav")
-            mixer.music.play()
+            mixer.music.play(loops=3)
 
 
 def stop_alarm():
-    mixer.music.stop()
+    global alarm_setting
+    global current_thread
+    try:
+        if mixer.get_init():
+            alarm_setting = False
+            mixer.music.stop()
+        elif current_thread is not None:
+            current_thread.join()
+            current_thread = None
+    except pygame.error:
+        print("闹钟尚未启动，无需停止！")
+        #alarm_setting = False
+
+    #if current_thread is not None:
+        #current_thread.join()
+        #current_thread = None
+
+def threading():
+    global alarm_setting
+    global current_thread
+    if current_thread is not None:
+        stop_alarm()
+
+    alarm_setting = True
+    current_thread = Thread(target=alarm)
+    current_thread.start()
 
 
-Label(root, text="Alarm Clock", font=("Helvetica 20 bold"), fg="red").pack(pady=10)
-Label(root, text="Set Time", font=("Helvetica 15 bold")).pack()
 
-frame = Frame(root)
+
+
+tk.Label(root, text="Alarm Clock", font="Helvetica 20 bold", fg="red").pack(pady=10)
+tk.Label(root, text="Set Time", font="Helvetica 15 bold").pack()
+
+frame = tk.Frame(root)
 frame.pack()
 
-hour = StringVar(root)
-hours = (
-    "00",
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "08",
-    "09",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-)
+hour = tk.StringVar(root)
+hours = [f"{i:02}" for i in range(24)]
 hour.set(hours[0])
 
-hrs = OptionMenu(frame, hour, *hours)
-hrs.pack(side=LEFT)
+tk.OptionMenu(frame, hour, *hours).pack(side = tk.LEFT)
+#hrs.pack(side = tk.LEFT)
 
-minute = StringVar(root)
-minutes = (
-    "00",
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "08",
-    "09",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "31",
-    "32",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    "53",
-    "54",
-    "55",
-    "56",
-    "57",
-    "58",
-    "59",
-    "60",
-)
+minute = tk.StringVar(root)
+minutes = [f"{i:02}" for i in range(60)]
 minute.set(minutes[0])
 
-mins = OptionMenu(frame, minute, *minutes)
-mins.pack(side=LEFT)
+tk.OptionMenu(frame, minute, *minutes).pack(side = tk.LEFT)
+#mins.pack(side = tk.LEFT)
 
-second = StringVar(root)
-seconds = (
-    "00",
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "08",
-    "09",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "31",
-    "32",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    "53",
-    "54",
-    "55",
-    "56",
-    "57",
-    "58",
-    "59",
-    "60",
-)
+second = tk.StringVar(root)
+seconds = [f"{i:02}" for i in range(60)]
 second.set(seconds[0])
 
-secs = OptionMenu(frame, second, *seconds)
-secs.pack(side=LEFT)
+tk.OptionMenu(frame, second, *seconds).pack(side = tk.LEFT)
+#secs.pack(side = tk.LEFT)
 
-Button(root, text="Set Alarm", font=("Helvetica 15"), command=Threading).pack(pady=20)
+tk.Button(root, text="Set Alarm", font="Helvetica 15", command=threading).pack(pady=20)
 
-button = Button(root, text="Stop Alarm", bg="red", fg="white", command=stop_alarm).pack(
-    pady=30
-)
+tk.Button(root, text="Stop Alarm", bg="red", fg="white", command=stop_alarm).pack(ipady=15, side=tk.BOTTOM)
 
-root.mainloop()
+def main():
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()
