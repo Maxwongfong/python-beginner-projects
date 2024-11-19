@@ -69,7 +69,7 @@ def main():
 
     elif x == "2":
         try:
-            encrypted = {}
+            encrypted = dict()
             encrypted["cipher_text"] = input("Enter the cipher text: ")
             encrypted["salt"] = input("Enter the salt: ")
             encrypted["nonce"] = input("Enter the nonce: ")
